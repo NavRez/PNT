@@ -1,11 +1,11 @@
 
 import copy
 
-def minimax(node, depth, isMaximizingPlayer, alpha, beta, nextNodes,nextNums,tokens,custDict,numSave,isStart): #based in the pseudocode from https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-4-alpha-beta-pruning/
+def minimax(node, depth, isMaximizingPlayer, alpha, beta, nextNodes,nextNums,tokens,custDict,numSave,isStart): 
 
     if depth > tokens:
         val = Standart(node,nextNodes,isMaximizingPlayer)
-        custDict[numSave].append(val)
+        custDict[numSave][0].append(val)
         return val
     
     if isMaximizingPlayer :
@@ -29,13 +29,19 @@ def minimax(node, depth, isMaximizingPlayer, alpha, beta, nextNodes,nextNums,tok
                         value = minimax(newnode, depth+1, False, alpha, beta,nxtNodes,newnums,tokens,custDict,numSave,False)
                     else:
                         value = minimax(newnode, depth+1, False, alpha, beta,nxtNodes,newnums,tokens,custDict,numSave,isStart)
+                    custDict[numSave][1][1]+=1
                     bestVal = max( bestVal, value) 
                     alpha = max( alpha, bestVal)
                     print("2 : max has taken move %d against min's %d" %(newnode,node))
                     print("current value of alpha = %f and beta = %f" %(alpha,beta))
                     #mydict[newnode] = custList
                     if beta <= alpha:
+                        custDict[numSave][1][3]+=1
                         break
+                if numSave != 0:
+                    custDict[numSave][1][0]+=1
+                    if depth > custDict[numSave][1][2]:
+                        custDict[numSave][1][2] = depth
         else:
             for newnode in nextNodes :
                 #customList=list()
@@ -51,20 +57,26 @@ def minimax(node, depth, isMaximizingPlayer, alpha, beta, nextNodes,nextNums,tok
                         value = minimax(newnode, depth+1, False, alpha, beta,nxtNodes,newnums,tokens,custDict,numSave,False)
                     else:
                         value = minimax(newnode, depth+1, False, alpha, beta,nxtNodes,newnums,tokens,custDict,numSave,isStart)
+                    custDict[numSave][1][1]+=1
                     bestVal = max( bestVal, value) 
                     alpha = max( alpha, bestVal)
                     print("2 : max has taken move %d against min's %d" %(newnode,node))
                     print("current value of alpha = %f and beta = %f" %(alpha,beta))
                     #mydict[newnode] = custDict
                     if beta <= alpha:
+                        custDict[numSave][1][3]+=1
                         break
                 else:
                     countmax+=1
+                if numSave != 0:
+                    custDict[numSave][1][0]+=1
+                    if depth > custDict[numSave][1][2]:
+                        custDict[numSave][1][2] = depth
         if countmax == len(nextNodes):
             print("max has no more moves, backtracking")
             print(nextNums)
             print("-1.0")
-            custDict[numSave].append(-1.0)
+            custDict[numSave][0].append(-1.0)
             return -1.0
         
         return bestVal
@@ -72,35 +84,73 @@ def minimax(node, depth, isMaximizingPlayer, alpha, beta, nextNodes,nextNums,tok
     else :
         bestVal = float('inf')
         countmin = 0
-        for newnode in nextNodes :
-            #customList=list()
-            if isFactor(newnode,node):
-                nxtNodes  = copy.deepcopy(nextNodes)
-                nxtNodes.remove(newnode)
-                newnums = copy.deepcopy(nextNums)
-                newnums.append(newnode)
-                print("min has taken move %d against max's %d" %(newnode,node))
-                value = 0
-                if isStart:
-                    numSave = newnode
-                    value = minimax(newnode, depth+1, True, alpha, beta,nxtNodes,newnums,tokens,custDict,numSave,False)
+        if len(nextNums) == 0:
+            ran = int(tokens)
+            ran=int(ran/2)
+            for i in range(ran):
+                #customList=list()
+                if nextNodes[i]%2 == 1:
+                    newnode = nextNodes[i]
+                    nxtNodes  = copy.deepcopy(nextNodes)
+                    nxtNodes.remove(newnode)
+                    newnums = copy.deepcopy(nextNums)
+                    newnums.append(newnode)
+                    print("min has taken move %d against max's %d" %(newnode,node))
+                    value = 0
+                    if isStart:
+                        numSave = newnode
+                        value = minimax(newnode, depth+1, True, alpha, beta,nxtNodes,newnums,tokens,custDict,numSave,False)
+                    else:
+                        value = minimax(newnode, depth+1, True, alpha, beta,nxtNodes,newnums,tokens,custDict,numSave,isStart)
+                    custDict[numSave][1][1]+=1
+                    bestVal = max( bestVal, value) 
+                    alpha = max( alpha, bestVal)
+                    print("2 : min has taken move %d against max's %d" %(newnode,node))
+                    print("current value of alpha = %f and beta = %f" %(alpha,beta))
+                    #mydict[newnode] = custList
+                    if beta <= alpha:
+                        custDict[numSave][1][3]+=1
+                        break
+                if numSave != 0:
+                    custDict[numSave][1][0]+=1
+                    if depth > custDict[numSave][1][2]:
+                        custDict[numSave][1][2] = depth
+        else:
+            for newnode in nextNodes :
+                #customList=list()
+                if isFactor(newnode,node):
+                    nxtNodes  = copy.deepcopy(nextNodes)
+                    nxtNodes.remove(newnode)
+                    newnums = copy.deepcopy(nextNums)
+                    newnums.append(newnode)
+                    print("min has taken move %d against max's %d" %(newnode,node))
+                    value = 0
+                    if isStart:
+                        numSave = newnode
+                        value = minimax(newnode, depth+1, True, alpha, beta,nxtNodes,newnums,tokens,custDict,numSave,False)
+                    else:
+                        value = minimax(newnode, depth+1, True, alpha, beta,nxtNodes,newnums,tokens,custDict,numSave,isStart)
+                    custDict[numSave][1][1]+=1
+                    bestVal = min( bestVal, value) 
+                    beta = min( beta, bestVal)
+                    print("2 : min has taken move %d against max's %d" %(newnode,node))
+                    print("current value of alpha = %f and beta = %f" %(alpha,beta))
+                    #mydict[newnode] = custList
+                    if beta <= alpha:
+                        custDict[numSave][1][3]+=1
+                        break
                 else:
-                    value = minimax(newnode, depth+1, True, alpha, beta,nxtNodes,newnums,tokens,custDict,numSave,isStart)
-                bestVal = min( bestVal, value) 
-                beta = min( beta, bestVal)
-                print("2 : min has taken move %d against max's %d" %(newnode,node))
-                print("current value of alpha = %f and beta = %f" %(alpha,beta))
-                #mydict[newnode] = custList
-                if beta <= alpha:
-                    break
-            else:
-                countmin+=1
+                    countmin+=1
+                if numSave != 0:
+                    custDict[numSave][1][0]+=1
+                    if depth > custDict[numSave][1][2]:
+                        custDict[numSave][1][2] = depth
         
         if countmin == len(nextNodes):
             print("min has no more moves, backtracking")
             print("1.0")
             print(nextNums)
-            custDict[numSave].append(1.0)
+            custDict[numSave][0].append(1.0)
             return 1.0
 
         return bestVal
@@ -185,7 +235,7 @@ for num in range(2,used+2):
 
 mydict = dict()
 for num in totals:
-    mydict[num] = list()
+    mydict[num] = [[],[0,0,0,0]]
 if len(nums) != 0:
     minimax(nums[len(nums)-1],0,True,float('-inf'),float('inf'),totals,nums,tokens,mydict,0,True)
 else:

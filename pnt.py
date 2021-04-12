@@ -24,9 +24,9 @@ def minimax(node, depth, isMaximizingPlayer, alpha, beta, nextNodes,nextNums,tok
                     newnums.append(newnode)
                     print("max has taken move %d against min's %d" %(newnode,node))
                     value = 0
-                    if isStart:
+                    if isStart == 1:
                         numSave = newnode
-                        value = minimax(newnode, depth+1, False, alpha, beta,nxtNodes,newnums,tokens,custDict,numSave,False)
+                        value = minimax(newnode, depth+1, False, alpha, beta,nxtNodes,newnums,tokens,custDict,numSave,3)
                     else:
                         value = minimax(newnode, depth+1, False, alpha, beta,nxtNodes,newnums,tokens,custDict,numSave,isStart)
                     custDict[numSave][1][1]+=1
@@ -52,9 +52,9 @@ def minimax(node, depth, isMaximizingPlayer, alpha, beta, nextNodes,nextNums,tok
                     newnums.append(newnode)
                     print("max has taken move %d against min's %d" %(newnode,node))
                     value = 0
-                    if isStart:
+                    if isStart == 1:
                         numSave = newnode
-                        value = minimax(newnode, depth+1, False, alpha, beta,nxtNodes,newnums,tokens,custDict,numSave,False)
+                        value = minimax(newnode, depth+1, False, alpha, beta,nxtNodes,newnums,tokens,custDict,numSave,3)
                     else:
                         value = minimax(newnode, depth+1, False, alpha, beta,nxtNodes,newnums,tokens,custDict,numSave,isStart)
                     custDict[numSave][1][1]+=1
@@ -97,9 +97,9 @@ def minimax(node, depth, isMaximizingPlayer, alpha, beta, nextNodes,nextNums,tok
                     newnums.append(newnode)
                     print("min has taken move %d against max's %d" %(newnode,node))
                     value = 0
-                    if isStart:
+                    if isStart == 2:
                         numSave = newnode
-                        value = minimax(newnode, depth+1, True, alpha, beta,nxtNodes,newnums,tokens,custDict,numSave,False)
+                        value = minimax(newnode, depth+1, True, alpha, beta,nxtNodes,newnums,tokens,custDict,numSave,3)
                     else:
                         value = minimax(newnode, depth+1, True, alpha, beta,nxtNodes,newnums,tokens,custDict,numSave,isStart)
                     custDict[numSave][1][1]+=1
@@ -125,9 +125,9 @@ def minimax(node, depth, isMaximizingPlayer, alpha, beta, nextNodes,nextNums,tok
                     newnums.append(newnode)
                     print("min has taken move %d against max's %d" %(newnode,node))
                     value = 0
-                    if isStart:
+                    if isStart == 2:
                         numSave = newnode
-                        value = minimax(newnode, depth+1, True, alpha, beta,nxtNodes,newnums,tokens,custDict,numSave,False)
+                        value = minimax(newnode, depth+1, True, alpha, beta,nxtNodes,newnums,tokens,custDict,numSave,3)
                     else:
                         value = minimax(newnode, depth+1, True, alpha, beta,nxtNodes,newnums,tokens,custDict,numSave,isStart)
                     custDict[numSave][1][1]+=1
@@ -216,7 +216,45 @@ def divisor(n): # taken from https://www.w3resource.com/python-exercises/basic/p
   for i in range(n):
     x = len([i for i in range(1,n+1) if not n % i])
   return x
-   
+
+def SortUp(mydict,isMaximizingPlayer):
+    truelist = list()
+    for x,y in mydict.items():
+        if len(y[0]) == 0:
+            continue
+        else:
+            part = list()
+            sum = 0
+            val = float("inf")
+            if isMaximizingPlayer:
+                for nums in y[0]:
+                    sum+=nums
+                    if nums < val:
+                        val = nums
+            else:
+                val = float("-inf")
+                for nums in y[0]:
+                    sum+=nums
+                    if nums > val:
+                        val = nums
+
+            sum = sum/len(y[0])
+            part.append(x)
+            part.append(sum)
+            part.append(val)
+            truelist.append(part)
+
+    return truelist
+
+def movemapper(listing,info):
+    print("Move : " + str(listing[0]))
+    print("Value : " + str(listing[2]))
+    print("Nodes Visited : " + str(info[1][0]))
+    print("Nodes Evaluated : " + str(info[1][1]))
+    print("Max Depth reached : " + str(info[1][3]))
+    val = info[1][0]/(info[1][0] + info[1][2])
+    print("Average Effective Branching : " + str(val) )
+    
 
 file = open('command.txt', 'r')
 Line = file.readline()
@@ -237,8 +275,42 @@ mydict = dict()
 for num in totals:
     mydict[num] = [[],[0,0,0,0]]
 if len(nums) != 0:
-    minimax(nums[len(nums)-1],0,True,float('-inf'),float('inf'),totals,nums,tokens,mydict,0,True)
+    if len(nums)%2==0:
+        minimax(nums[len(nums)-1],int(x[len(x) - 1]),True,float('-inf'),float('inf'),totals,nums,tokens,mydict,0,1)
+        finalList = SortUp(mydict,True)
+
+        holder = -100
+        rememNum = 0
+        counter = 0
+        for listing in finalList:
+            if listing[1] > holder:
+                rememNum = counter
+                holder = listing[1]
+            counter+=1
+        movemapper(finalList[rememNum],mydict[listing[0]])
+    else:
+        minimax(nums[len(nums)-1],int(x[len(x) - 1]),False,float('-inf'),float('inf'),totals,nums,tokens,mydict,0,2)
+        finalList = SortUp(mydict,False)
+        holder = 100
+        rememNum = 0
+        counter = 0
+        for listing in finalList:
+            if listing[1] < holder:
+                rememNum = counter
+                holder = listing[1]
+            counter+=1
+        movemapper(finalList[rememNum],mydict[listing[0]])
 else:
-    minimax(0,0,True,float('-inf'),float('inf'),totals,nums,tokens,mydict,0,True)
+    minimax(0,int(x[len(x) - 1]),True,float('-inf'),float('inf'),totals,nums,tokens,mydict,0,1)
+    finalList = SortUp(mydict,True)
+    holder = -100
+    rememNum = 0
+    counter = 0
+    for listing in finalList:
+        if listing[1] > holder:
+            rememNum = counter
+            holder = listing[1]
+        counter+=1
+    movemapper(finalList[rememNum],mydict[listing[0]])
 
 print("hello world")

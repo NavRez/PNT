@@ -3,6 +3,6 @@ The Pick-Numbered-Token game is a technical game played between two players : MA
 
 The goal of this project was to explore how many nodes can be explored using an Alpha-Beta prunning tree. a txt input is given with the first value being the number of tokens and the last being the depth at which the tree needs to be explored (with 0 being to leaf nodes and N being the orignal node). There's a heuristic property that was used to define the associated heuristic values for alpha and beta. More information can be found in the PDF.
 
-#How to run
+## How to run
 
 import all of the pre-requisites and enter the desired values in your txt file. Run the code and await for the results.

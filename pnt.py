@@ -253,7 +253,7 @@ def movemapper(listing,info):
     print("Nodes Evaluated : " + str(info[1][1]))
     print("Max Depth reached : " + str(info[1][3]))
     val = info[1][0]/(info[1][0] + info[1][2])
-    print("Average Effective Branching : " + str(val) )
+    print("Average Effective Branching : " + str(1/val) )
     
 
 file = open('command.txt', 'r')
@@ -312,5 +312,3 @@ else:
             holder = listing[1]
         counter+=1
     movemapper(finalList[rememNum],mydict[listing[0]])
-
-print("hello world")
